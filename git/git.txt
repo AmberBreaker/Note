@@ -1,0 +1,20 @@
+=================== git将本地代码上传到远程仓库
+0.	创建一个空的远程仓库，如github
+1.	（先进入项目文件夹）通过命令 git init 把这个目录变成git可以管理的仓库。
+	git init
+
+2.	把文件添加到版本库中，使用命令 git add . 添加到暂存区里面去，意为添加文件夹下的所有文件夹。
+	git add .
+
+3.	commit到主分支。
+	git commit -m "描述"
+
+4.	登录github，把本地仓库提交至远程仓库。
+	git remote add origin (远程仓库地址，如：https://github.com/AmberBreaker/JavaProjects.git)
+	这个过程中会要求输入远程仓库的用户名与密码。
+
+5.	进行第一次提交。
+	git push -u origin master
+
+6.	用sourcetree进行管理。
+	选择添加已存在的本地仓库。

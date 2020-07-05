@@ -1,0 +1,62 @@
+.pos_fix
+{
+	/* The element with the style won't be moved even if the window's position is changed
+		other such as:
+		relative: You can move the element relatively, but it won't change the original space.
+		absolute: You can move the element's position absolutely depend on the parent-element.
+	*/
+	position: fixed;
+	/*You can define the position with properties of top, right ... */
+	top: 30px;
+	left: 20px;
+}
+.pos_sticky
+{
+	/*
+		The sticky style rely on the user's operate of scroll.
+		When over the target area, it more like position: fixed.
+		When in the target area, it more like position: relative.
+	*/
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+	/* Define the position when over the target area */
+    top: 0;
+    background-color: green;
+    border: 1px solid #4CAF50;
+}
+.pos_z-index
+{
+	position:absolute;
+	left:0px;
+	top:0px;
+	/*Set the stack order of the element
+		-1: These elements will show behind the other elements.
+	*/
+	z-index:-1;
+}
+.pos_overflow
+{
+    background: #FFFFFF;
+    color: black;
+    padding: 15px;
+    width: 60%;
+    height: 50%;
+	/*
+		visible: The overflow content will show out of the frame.
+		hidden: The overflow content will be hidden.
+		scroll: Create scroll bar whether the content is overflowed or not.
+		auto: If the content is trimmed, the overflow content will be displayed by using scroll bar.
+		inherit: Inherited the style from the parent element.
+	*/
+    overflow: scroll;
+    border: 1px solid #ccc;
+}
+/*Amplify the first character and show in the left of the text*/
+span.firstCharacter
+{
+	float: left;
+	width: 1.2em;
+	font-size: 400%;
+	font-family: algerian,courier;
+	line-height: 80%;
+}

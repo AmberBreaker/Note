@@ -1,0 +1,379 @@
+================================================================<增>================================================================
+1.	创建/切换数据库（如：local），若该数据库不存在，则创建并切换至该数据库
+>	use local
+
+2.	创建集合
+>	db.createCollection(name, options)
+	name: 要创建的集合名称
+	options: 可选参数, 指定有关内存大小及索引的选项，其中参数如下：
+		字段					类型											描述
+		capped					布尔		（可选）如果为 true，则创建固定集合。固定集合是指有着固定大小的集合，当达到最大值时，
+													它会自动覆盖最早的文档。当该值为 true 时，必须指定 size 参数。
+		autoIndexId				布尔		（可选）如为 true，自动在 _id 字段创建索引。默认为 false。
+		size					数值		（可选）为固定集合指定一个最大值（以字节计）。如果 capped 为 true，也需要指定该字段。
+		max						数值		（可选）指定固定集合中包含文档的最大数量。
+	示例1：（无参数）
+		db.createCollection("col0")
+	示例2：（带参数）
+		db.createCollection("col1", { capped : true, autoIndexId : true, size : 6142800, max : 10000 })
+
+3.	为指定集合（col）插入文档
+	方法1：
+	>	db.col.insert(document)
+		例：
+		db.col.insert({
+			title: 'MongoDB 教程', 
+			description: 'MongoDB 是一个 Nosql 数据库',
+			by: '菜鸟教程',
+			url: 'http://www.runoob.com',
+			tags: ['mongodb', 'database', 'NoSQL'],
+			likes: 100
+		})
+	方法2：
+		先将数据定义为一个变量
+	>	document=({
+			title: 'MongoDB 教程', 
+			description: 'MongoDB 是一个 Nosql 数据库',
+			by: '菜鸟教程',
+			url: 'http://www.runoob.com',
+			tags: ['mongodb', 'database', 'NoSQL'],
+			likes: 100
+		});
+		用该变量插入
+		db.col.insert(document)
+
+	方法3：（3.2版本之后）
+		插入单条数据：
+			> var document = db.col.insertOne({"a": 3})
+		插入多条数据：
+			> var res = db.col.insertMany([{"b": 3}, {'c': 4}])
+		分别查看：
+		> document
+		{
+			"acknowledged" : true,
+			"insertedId" : ObjectId("571a218011a82a1d94c02333")
+		}
+		> res
+		{
+			"acknowledged" : true,
+			"insertedIds" : [
+				ObjectId("571a22a911a82a1d94c02337"),
+				ObjectId("571a22a911a82a1d94c02338")
+			]
+		}
+
+4.	创建 MongoDB 索引：createIndex() 方法
+>	db.collection.createIndex(keys, options)
+	options可选参数
+	Parameter				Type											Description
+	background				Boolean				建索引过程会阻塞其它数据库操作，background 可指定以后台方式创建索引，
+												即增加 "background" 可选参数。"background" 默认值为false。
+	unique					Boolean				建立的索引是否唯一。指定为true创建唯一索引。默认值为false。
+	sparse					Boolean				对文档中不存在的字段数据不启用索引。这个参数需要特别注意：如果设置为 true 的话，
+												在索引字段中不会查询出不包含对应字段的文档。默认值为 false。
+	name					string				索引的名称。如果未指定，MongoDB的通过连接索引的字段名和排序顺序生成一个索引名称。
+	dropDups				Boolean				在建立唯一索引时是否删除重复记录,指定 true 创建唯一索引。默认值为 false。
+	expireAfterSeconds		integer				指定一个以秒为单位的数值，完成 TTL 设定，设定集合的生存时间。
+	v						index version		索引的版本号。默认的索引版本取决于 mongod 创建索引时运行的版本。
+	weights					document			索引权重值，数值在 1 到 99,999 之间，表示该索引相对于其他索引字段的得分权重。
+	default_language		string				对于文本索引，该参数决定了停用词及词干和词器的规则的列表。默认为英语。
+	language_override		string				对于文本索引，该参数指定了包含在文档中的字段名，语言覆盖默认的language，
+												默认值为 language。
+	例：
+	db.col.createIndex({title : 1})								-- 1：升序，2：降序
+	db.col.createIndex({title : 1, description : -1})			-- 设置使用多个字段创建索引
+	db.col.createIndex({title : 1}, {background : true})		-- 在后台创建索引
+
+5.	创建联合索引（联合索引字段为：gender，user_name）
+>	db.users.ensureIndex({gender : 1, user_name : 1})
+
+
+
+
+================================================================<删>================================================================
+1.	删除当前数据库
+>	db.dropDatabase()
+
+2.	删除指定集合
+>	db.col.drop()
+	可先用show collections查看下当前数据库中的集合（假设有col集合）
+	若返回true，则删除成功。
+
+3.	删除文档
+	remove()方式
+>		db.collection.remove(
+			<query>,
+			<justOne>
+		)
+		或（2.6版本之后）
+>		db.collection.remove(
+			<query>,
+			{
+				justOne: <boolean>,
+				writeConcern: <document>
+			}
+		)
+		query 			:（可选）删除的文档的条件。
+		justOne 		:（可选）如果设为 true 或 1，则只删除一个文档。
+		writeConcern 	:（可选）抛出异常的级别。
+		
+		例：
+		db.col.remove({})			-- 删除col下所有数据
+		db.col.remove({
+			title : 'zhangsan'
+		})							-- 删除满足条件的所有数据
+		db.col.remove(
+			{ title : 'zhangsan' }，
+			{ justOne : true }
+		)							-- 删除找到满足条件的第一条数据
+
+	delete方式*（3.2版本之后）
+>	删除集合下全部文档：
+		db.inventory.deleteMany({})
+	删除 status 等于 A 的全部文档：
+		db.inventory.deleteMany({ status : "A" })
+	删除 status 等于 D 的一个文档：
+		db.inventory.deleteOne({ status: "D" })
+
+
+
+
+
+================================================================<改>================================================================
+1.	更新已存在的文档
+>	db.collection.update(
+	   <query>,
+	   <update>,
+	   {
+		 upsert: <boolean>,
+		 multi: <boolean>,
+		 writeConcern: <document>
+	   }
+	)
+	参数说明：
+	query 			: update的查询条件，类似sql update查询内where后面的。
+	update 			: update的对象和一些更新的操作符（如$,$inc...）等，也可以理解为sql update查询内set后面的
+	upsert 			: 可选，这个参数的意思是，如果不存在update的记录，是否插入objNew，true为插入，默认是false，不插入。
+	multi 			: 可选，mongodb默认是false，只更新找到的第一条记录，如果这个参数为true，就把按条件查出来多条记录全部更新。
+	writeConcern 	: 可选，抛出异常的级别。
+	
+	实例：（假设我们已经插入了如下文档）
+	db.col.insert({
+		title: 'MongoDB 教程', 
+		description: 'MongoDB 是一个 Nosql 数据库',
+		by: '菜鸟教程',
+		url: 'http://www.runoob.com',
+		tags: ['mongodb', 'database', 'NoSQL'],
+		likes: 100
+	})
+	通过 update()方法来更新标题(title):
+	db.col.update({title : 'MongoDB 教程'}, {$set : {title : 'MongoDB'}})					-- 只更新发现的第一条文档
+	db.col.update({title : 'MongoDB 教程'}, {$set : {title : 'MongoDB'}}, {multi : true})	-- 更新所有符合条件的文档
+>	更多实例
+	只更新第一条记录：
+	db.col.update({count : {$gt : 1}}, {$set : {col2 : "OK"}});
+	全部更新：
+	db.col.update({count : {$gt : 3}}, {$set : {col2 : "OK"}}, false, true);
+	只添加第一条：
+	db.col.update({count : {$gt : 4}}, {$set : {col5 : "OK"}}, true, false);
+	全部添加加进去:
+	db.col.update({count : {$gt : 5}}, {$set : {col5 : "OK"}}, true, true);
+	全部更新：
+	db.col.update({count : {$gt : 15}}, {$inc : {count : 1}}, false, true);
+	只更新第一条记录：
+	db.col.update({count : {$gt : 10}}, {$inc : {count : 1}}, false, false);
+	
+>	在3.2版本开始，MongoDB提供以下更新集合文档的方法：
+	db.collection.updateOne() 向指定集合更新单个文档
+	db.collection.updateMany() 向指定集合更新多个文档
+	首先我们在col集合里插入测试数据
+	use col
+	db.col.insert([
+		{"name":"abc","age":"25","status":"zxc"},
+		{"name":"dec","age":"19","status":"qwe"},
+		{"name":"asd","age":"30","status":"nmn"},
+	])
+	更新单个文档
+	db.col.updateOne({"name":"abc"},{$set:{"age":"28"}})
+	更新多个文档
+	db.col.updateMany({"age":{$gt:"10"}},{$set:{"status":"old"}})
+
+2.	通过传入的文档来替换已有文档
+	db.collection.save(
+		<document>,
+		{
+			writeConcern: <document>
+		}
+	)
+	参数说明：
+		document 		: 文档数据。
+		writeConcern	: 可选，抛出异常的级别。
+	实例：（替换_id为 56064f89ade2f21f36b03136 的文档数据）
+		db.col.save({
+			"_id" : ObjectId("56064f89ade2f21f36b03136"),
+			"title" : "MongoDB",
+			"description" : "MongoDB 是一个 Nosql 数据库",
+			"by" : "Runoob",
+			"url" : "http://www.runoob.com",
+			"tags" : [
+				"mongodb",
+				"NoSQL"
+			],
+			"likes" : 110
+		})
+
+
+
+
+
+
+================================================================<查>================================================================
+1.	查询所有数据库列表
+>	show dbs
+	若一个数据库下没有数据，则show dbs不会显示该数据库，若想显示，可用insert插入数据即可
+
+2.	显示当前数据库
+>	db
+
+3.	查询当前数据库下的所有集合（即RDBMS中的表）
+>	show tables / show collections
+
+4.	查看指定集合（col）中已插入文档
+>	db.col.find()
+
+5.	MongoDB 查询文档
+>	通用查找
+	db.col.find(query, projection)
+	query			：可选，使用查询操作符指定查询条件
+	projection		：可选，使用投影操作符指定返回的键。查询时返回文档中所有键值，只需省略该参数即可（默认省略）
+	例：
+	db.col.find({title : 'zhangsan'})
+	db.col.find(query, {title: 1, by: 1}) 	// inclusion模式 指定返回的键，不返回其他键，此例中返回 title 和 by 键
+	db.col.find(query, {title: 0, by: 0}) 	// exclusion模式 指定不返回的键,返回其他键，此例中屏蔽 title 和 by 键
+	注意：两种模式不能混用（_id除外），如：
+	db.col.find(query, {title: 1, by: 0})	// 错误
+	db.col.find(query, {title: 1, by: 1, _id: 0}) // 正确
+
+>	以格式化（易读）的方式来显示所有文档：
+	db.col.find().pretty()
+
+>	查找一个文档，并且该文档以格式化（易读）的方式来显示，findOne()后不可加pretty()
+	db.col.findOne(query, projection)
+
+6.	MongoDB Limit() 方法：
+	limit()方法接受一个数字参数，该参数指定从MongoDB中读取的记录条数。
+	db.col.find().limit(NUMBER)
+
+7.	MongoDB skip() 方法：
+	使用skip()方法来跳过指定数量的数据，skip方法接受一个数字参数作为跳过的记录条数。
+	db.col.find().limit(NUMBER).skip(NUMBER)
+
+8.	MongoDB sort()方法：
+	db.col.find().sort({KEY:1})
+	例：（关于键，"" 可用可不用）
+	db.col.find().sort({"idx" : -1})	-- 按照 idx 字段降序排列
+	db.col.find().sort({idx : 1})		-- 按照 idx 字段升序排列
+	*skip(), limilt(), sort()三个放在一起执行的时候，执行的顺序是先 sort(), 然后是 skip()，最后是显示的 limit()。
+
+*9.	MongoDB 聚合：aggregate() 方法
+>	db.col.aggregate(AGGREGATE_OPERATION)
+
+	设有如下数据：
+	{
+		_id: ObjectId(7df78ad8902c)
+		title: 'MongoDB Overview', 
+		description: 'MongoDB is no sql database',
+		by_user: 'runoob.com',
+		url: 'http://www.runoob.com',
+		tags: ['mongodb', 'database', 'NoSQL'],
+		likes: 100
+	},
+	{
+		_id: ObjectId(7df78ad8902d)
+		title: 'NoSQL Overview', 
+		description: 'No sql database is very fast',
+		by_user: 'runoob.com',
+		url: 'http://www.runoob.com',
+		tags: ['mongodb', 'database', 'NoSQL'],
+		likes: 10
+	},
+	{
+		_id: ObjectId(7df78ad8902e)
+		title: 'Neo4j Overview', 
+		description: 'Neo4j is no sql database',
+		by_user: 'Neo4j',
+		url: 'http://www.neo4j.com',
+		tags: ['neo4j', 'database', 'NoSQL'],
+		likes: 750
+	},
+
+	管道
+	$project		：修改输入文档的结构。可以用来重命名、增加或删除域，也可以用于创建计算结果以及嵌套文档。
+	$match			：用于过滤数据，只输出符合条件的文档。$match使用MongoDB的标准查询操作。
+	$limit			：用来限制MongoDB聚合管道返回的文档数。
+	$skip			：在聚合管道中跳过指定数量的文档，并返回余下的文档。
+	$unwind			：将文档中的某一个数组类型字段拆分成多条，每条包含数组中的一个值。
+	$group			：将集合中的文档分组，可用于统计结果。
+	$sort			：将输入文档排序后输出。
+	$geoNear		：输出接近某一地理位置的有序文档。
+
+	聚合的表达式：
+	$sum					计算总和
+		db.col.aggregate([{$group : {_id : "$by_user", num_tutorial : {$sum : "$likes"}}}])
+	$avg					计算平均值
+		db.col.aggregate([{$group : {_id : "$by_user", num_tutorial : {$avg : "$likes"}}}])
+	$min					获取集合中所有文档对应值得最小值。
+		db.col.aggregate([{$group : {_id : "$by_user", num_tutorial : {$min : "$likes"}}}])
+	$max					获取集合中所有文档对应值得最大值。
+		db.col.aggregate([{$group : {_id : "$by_user", num_tutorial : {$max : "$likes"}}}])
+	$push					在结果文档中插入值到一个数组中。
+		db.col.aggregate([{$group : {_id : "$by_user", url : {$push: "$url"}}}])
+	$addToSet				在结果文档中插入值到一个数组中，但不创建副本。
+		db.col.aggregate([{$group : {_id : "$by_user", url : {$addToSet : "$url"}}}])
+	$first					根据资源文档的排序获取第一个文档数据。
+		db.col.aggregate([{$group : {_id : "$by_user", first_url : {$first : "$url"}}}])
+	$last					根据资源文档的排序获取最后一个文档数据
+		db.col.aggregate([{$group : {_id : "$by_user", last_url : {$last : "$url"}}}])
+
+	例：（类似于sql语句：select by_user as _id, count(*) as num_tutorial from col group by by_user）
+	db.col.aggregate([{$group : {_id : "$by_user", num_tutorial : {$sum : 1}}}])
+	展开：
+	db.col.aggregate([{
+		$group : {
+			_id : "$by_user", 
+			num_tutorial : {$sum : 1}
+		}
+	}])
+	结果：
+	{
+		"result" : [
+			{
+				"_id" : "runoob.com",
+				"num_tutorial" : 2
+			},
+			{
+				"_id" : "Neo4j",
+				"num_tutorial" : 1
+			}
+		],
+		"ok" : 1
+	}
+
+10.	MongoDB AND 条件
+	MongoDB 的 find() 方法可以传入多个键(key)，每个键(key)以逗号隔开，即常规 SQL 的 AND 条件。
+	db.col.find({key1:value1, key2:value2}).pretty()
+	例：db.col.find({"by":"菜鸟教程", "title":"MongoDB 教程"}).pretty()
+
+11.	MongoDB OR 条件
+	语句使用了关键字 $or,语法格式如下：
+	db.col.find({
+		$or: [
+			{key1: value1},
+			{key2: value2}
+		]
+	}).pretty()
+	例：db.col.find({$or:[{"by":"菜鸟教程"},{"title": "MongoDB 教程"}]}).pretty()
+
+12.	AND 和 OR 联合使用
+	以下实例演示了 AND 和 OR 联合使用，类似常规SQL语句为：'where likes > 50 AND (by = '菜鸟教程' OR title = 'MongoDB 教程')'
+	db.col.find({"likes":{$gt:50}, $or:[{"by":"菜鸟教程"},{"title":"MongoDB 教程"}]}).pretty()

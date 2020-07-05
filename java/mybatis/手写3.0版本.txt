@@ -1,0 +1,79 @@
+1.	面向对象的设计
+	a）类的定义
+		能独立描述一个信息（如配置文件信息、映射文件信息、学生、教师等）。
+		能独立针对描述信息，提供对应功能。
+	b）类的粒度划分
+		根据业务：如“用户”这个群体当种类过多时，可以拆分为“VIP用户”、“普通用户”等。
+		根据经验：当涉及到【设计层】时，开发者很难做到一锤定音，比如说“需求设计”、“UI设计”、“面向对象设计”等。设计层是一个不断优化，不断积累经验等过程。
+
+	c）类的复用性
+	d）类的隔离性
+		当某些功能发生改变时，不希望扩大影响范围
+2.	mybatis3.0版本解析
+	a）解析流程
+	|--	全局配置文件 解析类：XMLConfigBuilder
+	|	|--	<environment>、<mapper>
+	|--	映射配置文件 解析类：XMLMapperBuilder
+	|	|--	<select>、<update> ...  statement解析 --- XMLStatementBuilder（复用性很高）
+	|	|	|--	SQL文本、动态标签：XMLScriptBuilder
+	|-- 解析工具类
+	|	|--	DOM解析相关的工具类：第三方api，也是面向对象的一种方式。
+	
+
+	b）执行流程（考虑框架设计的初衷）
+	|--	对外提供方便程序员调用的执行接口（程序员不想关注JDBC或mybatis的处理细节）
+	|	|--	接口设计（对外提供CRUD操作）
+	|--	SqlSession内部去执行JDBC处理逻辑，但是如果需要使用缓存，那么需要单独的类去处理。
+	|	|--	执行JDBC代码的逻辑，可以封装到一个专业的类中去处理 -- Executor
+	|	|	|--	Executor使用一级缓存去处理 -- CachingExecutor
+	|	|	|--	Executor使用二级缓存去处理 -- BaseExecutor（抽象类）
+	|	|	|--	Execotor不使用缓存去处理 -- SimpleExecutor、BatchExecutor ...
+
+
+
+课程总结：
+	1、mybatis3.0版本中的类（面向对象的产物）
+	|--	封装数据的类
+	|	|--	Configuration：封装数据，提供对该数据操作的功能接口。
+	|	|--	MappedStatement
+	|	|	|--	SqlSource：封装数据，提供对该数据操作的功能接口。
+	|	|	|	|--	SqlNode：封装数据，提供对该数据操作的功能接口。
+	|	|	|--	BoundSql
+	|	|	|	|--	ParameterMapping
+	|--	封装业务功能的类
+		|--	解析流程
+		|	|--	XMLConfigBuilder
+		|	|--	XMLMapperBuilder
+		|	|--	XMLStatementBuilder
+		|	|--	XMLScriptBuilder
+		|	|--	SqlSourceParser：封装#{}解析功能，便于复用
+		|--	执行流程
+			|--	SqlSession接口
+			|--	SqlSessionFactory接口（工厂方法设计模式）
+			|--	SqlSessionFactoryBuilder（构建者模式）
+			|
+			|--	Executor接口：（四大组件之一）
+				|--	CachingExecutor：缓存执行器，主要针对二级缓存
+				|--	BaseExecutor：抽取共性的一级缓存功能（抽象模版方法设计模式）
+					|--	SimpleExecutor：简单执行器
+					|--	ReuseExecutor：Statement可重用的执行器
+					|--	BatchExecutor：可批处理的执行器
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

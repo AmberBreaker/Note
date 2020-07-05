@@ -1,0 +1,300 @@
+1.	MongoDB 关系
+	1	嵌入式关系：
+	实例：
+		{
+			"_id":ObjectId("52ffc33cd85242f436000001"),		-- 用户信息
+			"contact": "987654321",
+			"dob": "01-01-1991",
+			"name": "Tom Benzamin",
+			"address": [									-- 用户地址信息
+			{
+				"building": "22 A, Indiana Apt",
+				"pincode": 123456,
+				"city": "Los Angeles",
+				"state": "California"
+			},
+			{
+				"building": "170 A, Acropolis Apt",
+				"pincode": 456789,
+				"city": "Chicago",
+				"state": "Illinois"
+			}]
+		}
+	嵌入文档查询嵌入内容（查询用户的地址）
+		db.users.findOne({"name":"Tom Benzamin"},{"address":1})
+
+	2	引用式关系（通过引用文档的 id 字段来建立关系）
+	实例：
+		{
+			"_id":ObjectId("52ffc33cd85242f436000001"),
+			"contact": "987654321",
+			"dob": "01-01-1991",
+			"name": "Tom Benzamin",
+			"address_ids": [
+				ObjectId("52ffc4a5d85242602e000000"),
+				ObjectId("52ffc4a5d85242602e000001")
+			]
+		}
+	查询实例
+	查询 name 为 Tom Benzamin 的第一个 address_ids，result记录着地址中的 id
+		var result = db.users.findOne({"name" : "Tom Benzamin"},{"address_ids" : 1})
+	通过查询的 id 获取用户的详细地址信息。
+		var addresses = db.address.find({"_id" : {"$in" : result["address_ids"]}})
+		result["address_ids"]：result结果下的 "address_ids" 字段
+
+2.	MongoDB 数据库引用 -> 使用 DBRefs（引用嵌套）
+		引用链接通过DBRef对象建立，DBRef对象储存了如何找到目标文档的信息，
+		就像现实世界中的门牌号码一样（也类似关系型数据库中的外键)。
+		{ $ref : , $id : , $db :  }
+		其中
+			$ref	：集合名称
+			$id		：引用的id
+			$db		：数据库名称，可选参数
+		以下实例中用户数据文档使用了 DBRef, 字段 address：
+			{
+				"_id":ObjectId("53402597d852426020000002"),
+				"name": "Tom Benzamin",
+				"dob": "01-01-1991",
+				"contact": "987654321",
+				"address":
+				{
+					"$ref": "address_home",
+					"$id": ObjectId("534009e4d852427820000002"),
+					"$db": "runoob"
+				}
+			}
+		以下代码中，我们通过指定 $ref 参数（address_home 集合）来查找集合中指定id的用户地址信息：
+			var user = db.users.findOne({"name":"Tom Benzamin"})
+			var dbRef = user.address
+			db[dbRef.$ref].findOne({"_id" : (dbRef.$id)})
+
+3.	MongoDB 查询分析（ explain() ）
+		db.users.find({gender:"M"},{user_name:1,_id:0}).explain()
+
+4.	MongoDB ObjectId
+	1.	创建新的ObjectId：
+		newObjectId = ObjectId()
+		返回以下唯一生成的id：
+		->	ObjectId("5349b4ddd2781d08c09890f3")
+	2.	创建文档的时间戳：
+		ObjectId("5349b4ddd2781d08c09890f4").getTimestamp()
+		返回 ISO 格式的文档创建时间：
+		->	ISODate("2014-04-12T21:49:17Z")
+	3.	ObjectId 转换为字符串：
+		new ObjectId().str
+		返回Guid格式的字符串：
+		->	5349b4ddd2781d08c09890f3
+
+5.	MongoDB Map Reduce
+	设有数据：
+		db.posts.insert({
+			"post_text" : "test text",
+			"user_name" : "mark",
+			"status" : "active"
+		})
+				....
+		db.posts.insert({
+			"post_text" : "test text",
+			"user_name" : "runoob",
+			"status" : "disabled"
+		})
+				....
+	
+	基本语法：
+>		db.collection.mapReduce(
+			function() { emit(key, value); },  //map 函数
+			function(key, values) { return reduceFunction },   //reduce 函数
+			{
+				out	: collection,
+				query : document,
+				sort : document,
+				limit : number
+			}
+		)
+	其中：
+		map		：映射函数，生成键值对序列,作为 reduce 函数参数。
+		reduce	：统计函数，reduce 函数的任务就是将 key-values 变成 key-value，也就是把 values 数组变成一个单一的值 value。
+		out		：统计结果存放集合（不指定则使用临时集合,在客户端断开后自动删除）。
+		query	：一个筛选条件，只有满足条件的文档才会调用 map 函数。（query、limit、sort 可以随意组合）
+		sort	：和 limit 结合的 sort 排序参数（也是在发往 map 函数前给文档排序），可以优化分组机制。
+		limit	：发往 map 函数的文档数量的上限。（要是没有limit，单独使用sort的用处不大）
+	例：
+		db.posts.mapReduce(
+			function() { emit(this.user_name, 1); },
+			function(key, values) { return Array.sum(values) },
+			{
+				query : { status : "active" },
+				out : "post_total"
+			}
+		)
+	以上 mapReduce 输出结果为：
+		{
+			"result" : "post_total",
+			"timeMillis" : 23,
+			"counts" : {
+				"input" : 5,
+				"emit" : 5,
+				"reduce" : 1,
+				"output" : 2
+			},
+			"ok" : 1
+		}
+	体参数说明
+		result		：储存结果的 collection 的名字,这是个临时集合，MapReduce 的连接关闭后自动就被删除了。
+		timeMillis	：执行花费的时间，毫秒为单位。
+		input		：满足条件被发送到 map 函数的文档个数。
+		emit		：在map函数中emit被调用的次数，也就是所有集合中的数据总量。
+		ouput		：结果集合中的文档个数（count对调试非常有帮助）。
+		ok			：是否成功，成功为1。
+		err			：如果失败，这里可以有失败原因，不过从经验上来看，原因比较模糊，作用不大。
+
+	使用 find 操作符来查看 mapReduce 的查询结果：
+		db.posts.mapReduce(
+			function() { emit(this.user_name, 1); },		-- 1 代表查看数量
+			function(key, values) { return Array.sum(values) },
+			{
+				query : {status : "active"},
+				out : "post_total"
+			}
+		).find()
+	结果：
+		{ "_id" : "mark", "value" : 4 }
+		{ "_id" : "runoob", "value" : 1 }
+
+
+
+=========================================================== 索引 ===========================================================
+1.	MongoDB 覆盖索引查询
+	设有 users 集合：
+		{
+			"_id": ObjectId("53402597d852426020000002"),
+			"contact": "987654321",
+			"dob": "01-01-1991",
+			"gender": "M",
+			"name": "Tom Benzamin",
+			"user_name": "tombenzamin"
+		}
+	在 users 集合中创建联合索引，字段为 gender 和 user_name：
+		db.users.ensureIndex({gender : 1, user_name : 1})
+	该索引会覆盖以下查询（即以下查询会用到索引）：
+	（由于我们的索引中不包括 _id 字段，_id在查询中会默认返回，我们可以在MongoDB的查询结果集中排除它。）
+		db.users.find({gender : "M"},{user_name : 1, _id : 0})
+
+2.	MongoDB 高级索引
+	考虑以下文档集合（users）：
+	{
+		"name": "Tom Benzamin",		-- 普通字段
+		"tags":			-- 数组字段
+		[
+			"music",
+			"cricket",
+			"blogs"
+		],
+		"address":		-- 文档字段
+		{
+			"city": "Los Angeles",
+			"state": "California",
+			"pincode": "123"
+		}
+	}
+
+	1.	索引数组字段
+>		db.users.ensureIndex({"tags" : 1})
+		检索集合
+		db.users.find({tags : "cricket"})
+	2.	索引子文档字段
+>		db.users.ensureIndex({"address.city" : 1, "address.state" : 1, "address.pincode" : 1})
+		检索集合
+		db.users.find({"address.city":"Los Angeles"})
+
+3.	全文检索（2.6 版本之前需要手动启用索引，且使用方式有异，这里不加讨论）
+	1.	创建全文索引
+		考虑以下 posts 集合的文档数据，包含了文章内容（post_text）及标签（tags）：
+		{
+			"post_text" : "enjoy the mongodb articles on Runoob",	-- 文章内容（普通字段）
+		}
+		我们可以对 post_text 字段建立全文索引，这样我们可以搜索文章内的内容：
+		db.posts.ensureIndex({post_text : "text"})		-- "text" 代表全文索引
+	2.	使用全文索引
+		现在我们已经对 post_text 建立了全文索引，我们可以搜索文章中的关键词 runoob：
+		db.posts.find({$text : {$search : "runoob"}})
+		以下命令返回了如下包含 runoob 关键词的文档数据：
+		{
+			"_id" : ObjectId("53493d14d852429c10000002"),
+			"post_text" : "enjoy the mongodb articles on Runoob"
+		}
+	3.	删除全文索引
+		使用 find 命令查找索引名：
+			db.posts.getIndexes()
+		设有索引：post_text_text，执行以下命令来删除索引：
+			db.posts.dropIndex("post_text_text")
+
+4.	MongoDB 索引限制
+	1.	每个索引占据一定的存储空间，在进行插入，更新和删除操作时也需要对索引进行操作。
+		所以，如果你很少对集合进行读取操作，建议不使用索引。
+	2.	由于索引是存储在内存(RAM)中,你应该确保该索引的大小不超过内存的限制。
+		如果索引的大小大于内存的限制，MongoDB会删除一些索引，这将导致性能下降。
+	3.	索引不能被以下的查询使用：
+		正则表达式及非操作符，如 $nin, $not, 等。
+		算术运算符，如 $mod, 等。
+		$where 子句
+	4.	最大范围
+		集合中索引不能超过64个
+		索引名的长度不能超过128个字符
+		一个复合索引最多可以有31个字段
+
+5.	MongoDB GridFS
+	GridFS 用两个集合来存储一个文件：fs.files 与 fs.chunks 。
+	以下是简单的 fs.files 集合文档：
+	{
+		"filename" : "test.txt",
+		"chunkSize" : NumberInt(261120),
+		"uploadDate" : ISODate("2014-04-13T11:32:33.557Z"),
+		"md5" : "7b762939321e146569b07f72c62cca4f",
+		"length" : NumberInt(646)
+	}
+	以下是简单的 fs.chunks 集合文档：
+	{
+		"files_id": ObjectId("534a75d19f54bfec8a2fe44b"),
+		"n": NumberInt(0),
+		"data": "Mongo Binary Data"
+	}
+	
+	打开命令提示符，进入到MongoDB的安装目录的bin目录中，找到mongofiles.exe，并输入下面的代码：
+>	mongofiles.exe -d gridfs put song.mp3
+	-- Song.mp3	：音频文件名。
+	-- gridfs	：存储文件的数据名称。
+	
+	使用以下命令来查看数据库中文件的文档：
+>	db.fs.files.find()
+
+	我们可以看到 fs.chunks 集合中所有的区块，以下我们得到了文件的 _id 值，我们可以根据这个 _id 获取区块（chunk）的数据
+>	db.fs.chunks.find({
+		files_id : ObjectId('534a811bf8b4aa4d33fdf94d')
+	})
+
+6.	MongoDB 固定集合（Capped Collections）
+	1.	创建固定集合
+		我们通过 createCollection 来创建一个固定集合，且capped选项设置为true：
+			db.createCollection(
+				"cappedLogCollection",
+				{capped : true, size : 10000}
+			)
+
+		还可以指定文档个数,加上 max : 1000 属性：
+			db.createCollection(
+				"cappedLogCollection",
+				{capped : true, size : 10000, max : 1000}
+			)
+
+		判断集合是否为固定集合：
+			db.cappedLogCollection.isCapped()
+
+		如果需要将已存在的集合转换为固定集合可以使用以下命令：
+			db.runCommand({
+				"convertToCapped" : "posts", size : 10000
+			})
+	2.	固定集合查询
+		固定集合文档按照插入顺序储存的,默认情况下查询就是按照插入顺序返回的,
+		也可以使用$natural调整返回顺序。
+		db.cappedLogCollection.find().sort({ $natural : -1 })

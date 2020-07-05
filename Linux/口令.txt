@@ -1,0 +1,66 @@
+1.	查看系统占用
+	[root@blairscott ~]# ps -aux | sort -k4nr | head -N
+	1. head：-N可以指定显示的行数，默认显示10行。 
+	2. ps：参数a指代all——所有的进程，u指代userid——执行该进程的用户id，x指代显示所有程序，不以终端机来区分。
+	3. sort -k4nr中
+		k代表从根据哪一个关键词排序，后面的数字4表示按照第四列排序；
+		n指代numberic sort，根据其数值排序；
+		r指代reverse，这里是指反向比较结果，输出时默认从小到大，反向后从大到小。
+		本例中，可以看到%MEM在第4个位置，根据%MEM的数值进行由大到小的排序。-k3表示按照cpu占用率排序。
+
+	例：查看mysql的进程以及结束mysql的进程
+		查看进程：ps -aux | grep mysql	-- 此时第二列显示的为占用的进程号。
+		杀死进程：sudo kill -9 mysql的进程号
+		杀死整个mysqld进程：sudo killall mysqld
+		检查是否还有mysql进程存在：ps -e|grep mysql
+
+2.	查找某文件的路径：（如my.cnf文件）
+	[root@blairscott ~]# find / -name my.cnf
+
+3.	XShell上传下载：
+	1.	安装lrzsz
+		[root@blairscott ~]# yum -y install lrzsz
+	2.	上传文件，执行命令rz
+		[root@blairscott ~]# rz		-- 会跳出文件选择窗口，选择好文件，点击确认即可。
+	3.	下载文件，执行命令sz
+		[root@blairscott ~]# sz
+
+4.	删除文件或文件夹
+	sudo rm -rf 目录名称
+
+5.	必知
+	1.	查看各命令的使用文档
+		[root@test ~]# man [命令]，例：
+		[root@test ~]# man cp
+
+6.	目录管理
+	1.	ls : 列出目录，其中参数为：
+		-a : 全部的文件，连同隐藏档（开头为 . 的文件）一起列出来(常用)
+		-d : 仅列出目录本身，而不是列出目录内的文件数据(常用)
+		-l : 长数据串列出，包含文件的属性与权限等等数据.(常用)
+	2.	cd : 切换目录
+	3.	pwd : 现实当前的目录
+	4.	mkdir : 创建一个新的目录
+	5.	rmdir : 删除一个空的目录
+	6.	cp : 复制文件或目录
+		-a : 相当於 -pdr 的意思，至於 pdr 请参考下列说明；(常用)
+		-d : 若来源档为连结档的属性(link file)，则复制连结档属性而非文件本身；
+		-f : 为强制(force)的意思，若目标文件已经存在且无法开启，则移除后再尝试一次；
+		-i : 若目标档(destination)已经存在时，在覆盖时会先询问动作的进行(常用)
+		-l : 进行硬式连结(hard link)的连结档创建，而非复制文件本身；
+		-p : 连同文件的属性一起复制过去，而非使用默认属性(备份常用)；
+		-r : 递归持续复制，用於目录的复制行为；(常用)
+		-s : 复制成为符号连结档 (symbolic link)，亦即『捷径』文件；
+		-u : 若 destination 比 source 旧才升级 destination ！
+	7.	rm : 移除文件或目录
+		-f : 就是 force 的意思，忽略不存在的文件，不会出现警告信息；
+		-i : 互动模式，在删除前会询问使用者是否动作
+		-r : 递归删除啊！最常用在目录的删除了！这是非常危险的选项！！！
+			[root@test ~]# rm -fir file，例：
+			[root@test ~]# rm -rf /opt/help/test.txt
+	8.	mv : 移动文件与目录，或修改名称
+		-f : force 强制的意思，如果目标文件已经存在，不会询问而直接覆盖；
+		-i : 若目标文件 (destination) 已经存在时，就会询问是否覆盖！
+		-u : 若目标文件已经存在，且 source 比较新，才会升级 (update)
+			[root@test ~]# mv -fiu source destination，例：
+			[root@test ~]# mv -f /opt/test.txt /opt/help/

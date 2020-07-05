@@ -1,0 +1,9 @@
+1.	CentOS7 对外开放应用端口 https://blog.csdn.net/realjh/article/details/82048492
+	1.	查看想开点端口是否已开
+		firewall-cmd --query-port=15672/tcp
+	2.	添加指定需要开放的端口
+		firewall-cmd --add-port=15672/tcp --permanent
+	3.	重新载入添加的端口
+		firewall-cmd --reload
+	4.	再次查询确认是否开启成功
+		firewall-cmd --query-port=15672/tcp

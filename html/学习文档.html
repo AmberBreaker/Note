@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- Show the name of the current page on the tab. -->
+	<title>runoob</title>
+	<!-- Show a mini-picture on the left of the tab. -->
+	<link rel="shortcup icon" href="logo.png">
+	<!-- The label meta used to describe some basic metadata, such as charset, keywords etc.-->
+	<meta charset="utf-8"/>
+	<!-- Defined the keywords of the search engine. -->
+	<meta name="keywords" content="HTML, CSS, XML, XHTML, JavaScript"/>
+	<!-- Refresh the current page per 30 seconds -->
+	<!-- <meta http-equiv="refresh" content="30"> -->
+
+	<!-- <base href="http://www.runoob.com/images/" target="_blank"/> -->
+
+	<!-- Define the label's style we used in the body. -->
+	<style type="text/css">
+		body {background-color:white}
+		h3 {color:red;font-family:LiSu}
+	</style>
+	<!--  -->
+	<link rel="stylesheet" type="text/css" href="css/table.css">
+</head>
+<body>
+	<h3>send emails:<a href="https://blog.csdn.net/alsnei/article/details/54347776" target="_blank">more font style</a></h3>
+	<!-- tips: Spaces between word will be replaced by %20 to ensure the normal show. -->
+	<a href="mailto:someone@example.com?Subject=Hello%20again" target="_top">send email1</a><br/>
+	<!--
+		mailto	:	Keyword for send email.
+		cc		:	Carbon Copy, separated by ';' when more than 2 consumer.
+		bcc		:	Blind Carbon Copy, separated by ';' when more than 2 consumer.
+		subject	:	The theme of the email.
+		body	:	The content of the email.
+		?		:	The separator between address and parameter.
+		&		:	The separator between parameters.
+	-->
+	<a href="mailto:people1@example.com?cc=people2@example.com&bcc=people3@example.com&subject=Summer%20Party&body=You%20are%20invited%20to%20a%20big%20summer%20party!" target="_top">send email2</a>
+	<hr/>
+
+	<h3>base label:</h3>
+	<!-- It will open a new page because the target is defined in the '<base>' label. -->
+	<!-- <a href="http://www.runoob.com"><img src="logo.png"/></a> -->
+	<a href="http://www.runoob.com"><img src="http://www.runoob.com/images/logo.png"/></a>
+	<hr/>
+
+	<h3>images:</h3>
+	<img src="image/g1.gif" alt="picture" width="100" height="100"/><br/>
+	<img src="image/g2.jpeg" alt="picture" width="300" height="300" border="1" usemap="#picid"/>
+	<map name="picid">
+		<!-- Give the shape you defined access path. -->
+		<area shape="circle" coords="87,250,21" href="https://baike.baidu.com/item/%E6%B0%B4/34133?fr=aladdin" target="_blank">
+		<area shape="poly" coords="129,117,176,117,192,167,152,199,112,166" href="https://baike.baidu.com/item/%E4%BA%94%E8%BE%B9%E5%BD%A2/1953092?fr=aladdin" target="_blank">
+	</map>
+	<hr/>
+
+	<h3>tables:</h3>
+	<!-- border: the space of outer border -->
+	<!-- cellpadding: cell inner space between border and text -->
+	<!-- cellspacing: space between outer border and inner border -->
+	<table border="1" cellspacing="0" cellpadding="10" style="text-align: center;">
+		<caption>Survey</caption>
+		<tr>
+			<th>Name</th>
+			<!-- merge cols -->
+			<th colspan="2">Hobbies</th>
+		</tr>
+		<tr>
+			<td>zhangsan</td>
+			<td>tennis</td>
+			<td><a href="http://tg.37.com/?uid=2803408" target="_blank">gaming</a></td>
+		</tr>
+		<tr>
+			<td>lisi</td>
+			<td>computer</td>
+			<td>fishing</td>
+		</tr>
+	</table>
+	<table border="1" cellspacing="10">
+		<caption>Survey</caption>
+		<tr>
+			<th>Name</th>
+			<td>zhangsan</td>
+		</tr>
+		<tr>
+			<!-- merge rows -->
+			<th rowspan="2">Hobbies</th>
+			<td><a href="http://sports.sina.com.cn/tennis/">tennis</a></td>
+		</tr>
+		<tr>
+			<td><a href="http://tg.37.com/?uid=2803408" target="_blank">gaming</a></td>
+		</tr>
+	</table>
+	<!-- better examples -->
+	<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+		<tr>
+			<td align="center" class="tabtitle" height="60">受理员业务统计表</td>
+		</tr>
+		<tr>
+			<td align="right" height="25">2017-01-02---2017-05-02</td>
+		</tr>
+	</table>
+	<table width="100%" border="0" cellspacing="1" cellpadding="4" bgcolor="#cccccc" class="tabtop13" align="center">
+		<tr>
+			<td colspan="2" class="btbg font-center titfont" rowspan="2">受理员</td>
+			<td width="10%" class="btbg font-center titfont" rowspan="2">受理数</td>
+			<td width="10%" class="btbg font-center titfont" rowspan="2">自办数</td>
+			<td width="10%" class="btbg font-center titfont" rowspan="2">直接解答</td>
+			<td colspan="2" class="btbg font-center titfont">拟办意见</td>
+			<td colspan="2" class="btbg font-center titfont">返回修改</td>
+			<td colspan="3" class="btbg font-center titfont">工单类型</td>
+		</tr>
+		<tr>
+			<td width="8%" class="btbg font-center">同意</td>
+			<td width="8%" class="btbg font-center">比例</td>
+			<td width="8%" class="btbg font-center">数量</td>
+			<td width="8%" class="btbg font-center">比例</td>
+			<td width="8%" class="btbg font-center">建议件</td>
+			<td width="8%" class="btbg font-center">诉求件</td>
+			<td width="8%" class="btbg font-center">咨询件</td>
+		</tr>
+		<tr>
+			<td width="7%" rowspan="3" class="btbg1 font-center">受理处</td>
+			<td width="7%" class="btbg2">wangyan</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td class="btbg2">&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td class="btbg2 font-center">总计</td>
+			<td class="btbg2 font-center">20</td>
+			<td class="btbg2 font-center">20</td>
+			<td class="btbg2 font-center">20</td>
+			<td class="btbg2 font-center">20</td>
+			<td class="btbg2 font-center">20</td>
+			<td class="btbg2 font-center">20</td>
+			<td class="btbg2 font-center">20</td>
+			<td class="btbg2 font-center">20</td>
+			<td class="btbg2 font-center">20</td>
+			<td class="btbg2 font-center">20</td>
+		</tr>
+		<tr>
+			<td width="7%" rowspan="8" class="btbg1 font-center">话务组</td>
+			<td width="7%" class="btbg2">wangyan</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td width="7%" class="btbg2">wangyan</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+		</tr>
+		<tr>
+			<td class="btbg2 font-center">总计</td>
+			<td class="btbg2 font-center">20</td>
+			<td class="btbg2 font-center">20</td>
+			<td class="btbg2 font-center">20</td>
+			<td class="btbg2 font-center">20</td>
+			<td class="btbg2 font-center">20</td>
+			<td class="btbg2 font-center">20</td>
+			<td class="btbg2 font-center">20</td>
+			<td class="btbg2 font-center">20</td>
+			<td class="btbg2 font-center">20</td>
+			<td class="btbg2 font-center">20</td>
+		</tr>
+	</table><br/>
+	<hr/>
+
+	<h3>listing:</h3>
+	<!-- unordered listing -->
+	<ul type="circle">
+		<li>black</li>
+		<li>white</li>
+		<li>green</li>
+	</ul>
+	<!-- ordered listing -->
+	<ol>
+		<li>black</li>
+		<li>white</li>
+		<li>green</li>
+	</ol>
+	<!-- user-defined listing -->
+	<dl>
+		<dt>Coffee</dt>
+		<dd>- black hot drink</dd>
+		<dt>Milk</dt>
+		<dd>- white cold drink</dd>
+	</dl>
+	<!-- examples -->
+	<ol type="a">
+		<li>
+			<dl>
+				<dt>Coffee</dt>
+				<dd>- black hot drink</dd>
+			</dl>
+		</li>
+		<li>
+			<dl>
+				<dt>Milk</dt>
+				<dd>- white cold drink</dd>
+			</dl>
+		</li>
+	</ol>
+	<hr/>
+
+	<!-- html form -->
+	<h3>html form</h3>
+	<form action="" method="get">
+		text: <input type="text" name="loginName"/><br/>
+		password: <input type="password" name="password"/><br/>
+		<textarea name="content" rows="10" cols="30">I'm a textarea</textarea><br/>
+		<div>
+			<p>radio</p>
+			<!-- The attribute of name must be the same in one radio group. -->
+			<!-- Set the value default. -->
+			<input type="radio" name="sex" value="male" checked="checked"/> male
+			<input type="radio" name="sex" value="female"/> female
+		</div>
+		<div>
+			<p>checkbox</p>
+			<!-- The attribute of name must be the same in the checkbox group. -->
+			<input type="checkbox" name="hobbies" value="table-tennis"/> table-tennis<br/>
+			<input type="checkbox" name="hobbies" value="basketball"/> basketball<br/>
+			<input type="checkbox" name="hobbies" value="football"/> football
+		</div>
+		<!-- drop-down list -->
+		<select name="city">
+			<option value="Beijing">Beijing</option>
+			<!-- Set the value default. -->
+			<option value="Shanghai" selected="selected">Shanghai</option>
+			<option value="Guangzhou">Guangzhou</option>
+			<option value="Shenzhen">Shenzhen</option>
+		</select><br/>
+		<input id="demo" type="button" value="button"/><br/>
+		<!-- Submit all the contents in the html form. -->
+		<input type="submit" value="Submit"/>
+		<!-- Reset all the contents into a default value. -->
+		<input type="reset" value="Reset">
+	</form>
+	<hr/>
+
+	<!-- html frame -->
+	<h3>iframe</h3>
+	<iframe src="http://www.baidu.com" width="100%" height="100" frameborder="0">
+		<p>If your browser cannot support the iframe tag, show it.</p>
+	</iframe>
+	<hr/>
+
+	<!-- Canvas -->
+	<canvas id="myCanvas" width="100" height="100" style="border:1px solid #000000;"></canvas>
+	<hr/>
+
+	<!-- script -->
+	<!--
+		This tag is used for defining the client script. You can put the script into the tag directly, or introduce the outer script file by the attribute of src.
+	-->
+	<script type="text/javascript">
+		document.write("Hello World")
+	</script>
+	<hr/>
+
+	<!-- progress bar -->
+	<progress value="22" max="100"/>
+</body>
+</html>

@@ -1,0 +1,96 @@
+1.	MongoDB 数据类型：
+	String			字符串。存储数据常用的数据类型。在 MongoDB 中，UTF-8 编码的字符串才是合法的。
+	Integer			整型数值。用于存储数值。根据你所采用的服务器，可分为 32 位或 64 位。
+	Boolean			布尔值。用于存储布尔值（真/假）。
+	Double			双精度浮点值。用于存储浮点值。
+	Min/Max keys	将一个值与 BSON（二进制的 JSON）元素的最低值和最高值相对比。
+	Array			用于将数组或列表或多个值存储为一个键。
+	Timestamp		时间戳。记录文档修改或添加的具体时间。
+	Object			用于内嵌文档。
+	Null			用于创建空值。
+	Symbol			符号。该数据类型基本上等同于字符串类型，但不同的是，它一般用于采用特殊符号类型的语言。
+	Date			日期时间。用 UNIX 时间格式来存储当前日期或时间。你可以指定自己的日期时间：创建 Date 对象，传入年月日信息。
+	Object ID		对象 ID。用于创建文档的 ID。
+	Binary Data		二进制数据。用于存储二进制数据。
+	Code			代码类型。用于在文档中存储 JavaScript 代码。
+	Regular expression		正则表达式类型。用于存储正则表达式。
+
+2.	MongoDB 连接命令格式：
+	mongodb://username:password@hostname/dbname
+	如：mongodb://admin:123456@localhost/test
+
+3.	异常：
+	WriteConcern.NONE			: 没有异常抛出
+	WriteConcern.NORMAL			: 仅抛出网络错误异常，没有服务器错误异常
+	WriteConcern.SAFE			: 抛出网络错误异常、服务器错误异常；并等待服务器完成写操作。
+	WriteConcern.MAJORITY		: 抛出网络错误异常、服务器错误异常；并等待一个主服务器完成写操作。
+	WriteConcern.FSYNC_SAFE		: 抛出网络错误异常、服务器错误异常；写操作等待服务器将数据刷新到磁盘。
+	WriteConcern.JOURNAL_SAFE	: 抛出网络错误异常、服务器错误异常；写操作等待服务器提交到磁盘的日志文件。
+	WriteConcern.REPLICAS_SAFE 	: 抛出网络错误异常、服务器错误异常；等待至少2台服务器完成写操作。
+
+4.	MongoDB 与 RDBMS Where 语句比较：
+	等于			{<key>:<value>}				db.col.find({"by":"菜鸟教程"}).pretty()			where by = '菜鸟教程'
+	小于			{<key>:{$lt:<value>}}		db.col.find({"likes":{$lt:50}}).pretty()		where likes < 50
+	小于或等于		{<key>:{$lte:<value>}}		db.col.find({"likes":{$lte:50}}).pretty()		where likes <= 50
+	大于			{<key>:{$gt:<value>}}		db.col.find({"likes":{$gt:50}}).pretty()		where likes > 50
+	大于或等于		{<key>:{$gte:<value>}}		db.col.find({"likes":{$gte:50}}).pretty()		where likes >= 50
+	不等于			{<key>:{$ne:<value>}}		db.col.find({"likes":{$ne:50}}).pretty()		where likes != 50
+
+5.	MongoDB $type 操作符：
+	$type操作符是基于BSON类型来检索集合中匹配的数据类型，并返回结果。
+
+	类型							数字				备注
+	Double							1
+	String							2
+	Object							3
+	Array							4
+	Binary data						5
+	Undefined						6					已废弃。
+	Object id						7
+	Boolean							8
+	Date							9
+	Null							10
+	Regular Expression				11
+	JavaScript						13
+	Symbol							14
+	JavaScript (with scope)			15
+	32-bit integer					16
+	Timestamp						17
+	64-bit integer					18
+	Min key							255					Query with -1.
+	Max key							127
+
+	例：
+	db.col.find({"title" : {$type : 2}})	-- 获取 "col" 集合中 title 为 String 的数据
+
+6.	原子操作常用命令：
+	$set：用来指定一个键并更新键值，若键不存在并创建。
+		{ $set : { field : value } }
+
+	$unset：用来删除一个键。
+		{ $unset : { field : 1} }
+
+	$inc：对文档的某个值为数字型（只能为满足要求的数字）的键进行增减的操作。
+		{ $inc : { field : value } }
+
+	$push：增加一个值到一个数组字段内。
+		{ $push : { field : value } }
+		把value追加到field里面去，field一定要是数组类型才行，如果field不存在，会新增一个数组类型加进去。
+
+	$pushAll：同$push, 只是一次可以追加多个值到一个数组字段内。
+		{ $pushAll : { field : value_array } }
+
+	$pull：从数组field内删除一个等于value值。
+		{ $pull : { field : value } }
+
+	$addToSet：增加一个值到数组内，而且只有当这个值不在数组内才增加。
+		{ $addToSet: { field : value } }
+
+	$pop：删除数组的第一个或最后一个元素
+		{ $pop : { field : 1 } }
+
+	$rename：修改字段名称
+		{ $rename : { old_field_name : new_field_name } }
+
+	$bit：位操作，integer类型
+		{ $bit : { field : { and : 5 } } }

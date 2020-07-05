@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>local coordinate</title>
+</head>
+<body>
+	<p id="demo">get current coordinate</p>
+	<button onclick="getLocation()">Click!</button>
+	<div id="mapholder"></div>
+	<script src="https://maps.google.com/maps/api/js?sensor=false"></script>
+	<script>
+		var x = document.getElementById("demo");
+		function getLocation()
+		{
+			if (navigator.geolocation)
+			{
+				/*
+				 * getCurrentPosition: Get current position once.
+				 * watchPosition: Get current position and refresh it frequently, just like GPS.
+				 *		you should use a accurate device such as iphone.
+				 */
+				navigator.geolocation.getCurrentPosition(showPosition, showError);
+			}
+			else
+			{
+				x.innerHTML = "The broswer can't support it.";
+			}
+		}
+		function showPosition(position)
+		{
+			x.innerHTML = "latitude: " + position.coords.latitude + "<br>longitude: " + position.coords.longitude;   
+			lat = position.coords.latitude;
+			lon = position.coords.longitude;
+			pos = new google.maps.LatLng(lat, lon);
+			mapholder = document.getElementById("mapholder");
+			mapholder.style.height = "250px";
+			mapholder.style.width = "500px";
+			var myOptions = {
+				center:pos,
+				zoom:14,
+				mapTypeId:google.maps.MapTypeId.ROADMAP,
+				mapTypeControl:false,
+				navigationControlOptions:{style:google.maps.NavigationControlStyle.SMALL}
+			};
+		}
+		function showError(error)
+		{
+			switch(error.code) 
+			{
+				case error.PERMISSION_DENIED:
+					x.innerHTML="Permission Denied!"
+					break;
+				case error.POSITION_UNAVAILABLE:
+					x.innerHTML="Unavaliable Position!"
+					break;
+				case error.TIMEOUT:
+					x.innerHTML="Request Timed Out!"
+					break;
+				case error.UNKNOWN_ERROR:
+					x.innerHTML="Unknow Error!"
+					break;
+			}
+		}
+	</script>
+</body>
+</html>

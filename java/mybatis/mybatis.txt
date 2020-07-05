@@ -1,0 +1,59 @@
+1.	#{}和${}的区别是什么？
+	a)、#{}和${}取值方式是不同的（OGNL）。
+	b)、#{}是预编译的方式，${}是动态拼接字符串的方式。
+	c)、#{}和${}传的参数是简单类型的话，它们取之的参数名称是有区别的，也就是#{}和${}中的名称。
+	d)、${}存在SQL注入问题。
+	e)、解析顺序不同（#{}和${}谁先解析的问题）。
+		select * from user where username like '%${name}%' and age=#{age};
+		select * from user where age=#{age} and username like '%${name}%';
+	f)、#{}对于参数的处理，是需要根据类型来处理，比如字符串类型，处理之后会加上单引号，而${}不管类型，内容都是原样输出。
+
+2.	既然${}存在SQL注入问题，那么在什么场景下才能使用它。
+	from
+		${}存在很大风险，不能使用；同时，#{}也不可以使用。
+	where
+		存在SQL注入，略。
+	group by ${columnName}
+		能且只能使用${}
+	order by ${columnName}
+		能且只能使用${}
+
+3.	既然mybatis的SqlSession要求只能传入一个参数，那么以下代码如何解释。
+	int updateByExample(@Param("record") User record, @Param("example") UserExample example);
+	封装成Map对象，@Param注解中的值为key，@Param注解的参数为value
+	SqlSession.update(statementId, param);
+
+4.	DynamicSqlSource 和 RawSqlSource 的区别
+	DynamicSqlSource的SqlNode集合信息解析工作发生在【每一次调用getBoundSql方法】的时候。
+	RawSqlSource的SqlNode集合信息解析工作发生在【第一次构造RawSqlSource】的时候，因为被RawSqlSource封装的节点信息只需要被解析一次。
+
+课程主题：手写mybatis框架核心流程
+课程目标：
+	1.	了解mybatis框架的设计过程（1.0版本、2.0版本、3.0版本）
+	2.	手写mybatis1.0版本，目前是从JDBC原生代码过渡到properties配置文件的阶段
+	3.	手写mybatis2.0版本，目前是从properties配置文件过渡到xml配置文件的阶段，并且完成复杂的解析，
+		只是这个过程是通过面向过程的方式实现的。
+	4.	手写mybatis3.0版本，目的是从面向过程转化为面向对象的阶段。
+	5.	手写mybatis4.0版本，目的是使用设计模式来优化。
+
+课程内容：
+1.	手写mybatis1.0版本：从原生JDBC代码开始演变。（核心就是将JDBC代码去完成了代码和配置的分离）
+2.	手写mybatis2.0版本。（配置和代码分离，配置是XML文件，代码是使用面向过程去编写）
+	a)	加载XML配置文件（直接参看mybatis配置方式）
+		*【解析全局配置文件】（配置的是全应用范围内一次性的配置信息）
+			数据源的配置信息（driver、url、username、password） -- 最终解析出DataSource对象，并封装到Configuration对象中。
+			映射文件到信息
+		*【解析映射文件】：SqlSource和SqlNode都是为了存储数据，并且对存储了的数据对外提供了一些操作。
+		  ** 解析select标签（statement标签）
+		  ** 解析select标签中的SQL脚本信息（script）-- 封装成【SqlSource对象】 -- 封装了【SqlNode】
+	b)	JDBC执行代码（如果需要配置文件的信息，则需要从【Configuration】对象中获取）
+		*【获取链接】
+			使用数据源对象去优化连接的创建（DBCP，需要添加第三方的依赖，并且将信息配置到XML文件中）
+			需要通过Configuration对象，去获取解析出来的【DataSource】对象信息。
+		*【获取SQL】
+			拼接SQL语句：将所有的SqlNode中保存的信息都拼接到StringBuffer对象中，在拼接的过程中会将${}解决掉。
+				【SqlSource】 -> 【SqlNode集合】
+				【SqlNode】中既包含【SqlNode】，也会包含【SqlNode集合】。
+			解析SQL语句：将完整的SQL语句中的#{}处理掉。在解析之后，会形成两部分数据【最终的SQL语句、#{}中的属性名称】。并将信息封装到【staticSqlSource】
+			通过【SqlSource】获取 【BoundSql】(jdbc可执行的SQL语句, 参数信息集合);
+			通过【BoundSql】获取里面存储的SQL语句

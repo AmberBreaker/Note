@@ -1,0 +1,49 @@
+课程主题：
+	手写mybatis3.0版本
+	mybatis源码阅读
+	设计模式
+
+课程目标：
+	1、对于mybatis的3.0版本，你要将思路捋清
+	2、对于mybatis的四大组件的作用的了解
+	3、掌握源码阅读经验
+	4、可以自己尝试去阅读mybatis的源码
+	5、设计模式：
+	|--	工厂模式：
+		|--	简单工厂
+		|--	工厂方法
+		|--	抽象工厂
+
+							 | -> ParameterHandler
+Executor -> StatementHandler |
+							 | -> ResultSetHandler
+
+
+课程内容
+	1、继续手写mybatis3.0版本（四大组件的其他组件）
+	|--	StatementHandler接口（策略模式）：将statement的相关操作进行抽象并封装
+	|	|--	PreparedStatementHandler：专门执行【statementType】为【prepared】
+	|	|--	SimpleStatementHandler：专门执行【statementType】为【simple】
+	|	|--	CallableStatementHandler：专门执行【statementType】为【callable】
+	|--	ParameterHandler接口：专门处理参数设置。
+	|	|--	DefaultParameterHandler
+	|--	ResultSethandler接口：专门处理结果集。
+	|	|-- DefaultResultSetHandler
+
+
+
+
+源码阅读：
+	如何看源码：
+	1、要找到入口（主要看自己写的代码什么时候开始使用mybatis的API）
+	2、能debug跟踪则使用debug跟踪
+	3、一定要搞清楚源码的主流程，最怕钻牛角尖
+	4、借鉴别人经验
+
+mybatis源码中包含的设计模式：
+	NodeHandler：策略模式
+	SqlSessionFactoryBuilder：构建者模式
+	SqlSessionFactory：工厂方法模式
+	BaseExecutor：抽象模版方法模式
+	MapperProxyFactory：工厂模式
+	MapperProxy：动态代理模式
